@@ -91,16 +91,29 @@
 
   /* ---------- Link ativo no menu ---------- */
   var navLinks = document.querySelectorAll('.nav__link');
-  if ('IntersectionObserver' in window && navLinks.length) {
-    var sectionObserver = new IntersectionObserver(function (entries) {
-      entries.forEach(function (entry) {
-        if (!entry.isIntersecting) return;
-        navLinks.forEach(function (link) {
-          link.setAttribute('aria-current', String(link.getAttribute('href') === '#' + entry.target.id));
-        });
+  if (navLinks.length) {
+    var sections = Array.prototype.slice.call(document.querySelectorAll('main > section[id], footer[id]'));
+    var navRaf;
+    function updateActiveLink() {
+      var active = sections[0];
+      var doc = document.documentElement;
+      // No fim da página a última seção (rodapé) é a ativa, mesmo sendo baixa demais para chegar ao meio da tela
+      if (window.innerHeight + window.scrollY >= doc.scrollHeight - 2) {
+        active = sections[sections.length - 1];
+      } else {
+        var line = window.innerHeight * 0.45;
+        sections.forEach(function (s) { if (s.getBoundingClientRect().top <= line) active = s; });
+      }
+      navLinks.forEach(function (link) {
+        link.setAttribute('aria-current', String(link.getAttribute('href') === '#' + active.id));
       });
-    }, { rootMargin: '-45% 0px -50% 0px' });
-    document.querySelectorAll('main section[id], footer[id]').forEach(function (s) { sectionObserver.observe(s); });
+    }
+    window.addEventListener('scroll', function () {
+      cancelAnimationFrame(navRaf);
+      navRaf = requestAnimationFrame(updateActiveLink);
+    }, { passive: true });
+    window.addEventListener('resize', updateActiveLink);
+    updateActiveLink();
   }
 
   /* ---------- Entrada suave dos elementos ---------- */
