@@ -390,8 +390,7 @@ address { font-style: normal; }
   width: 100%; max-width: 280px; aspect-ratio: 1; overflow: hidden;
   border-radius: var(--radius-md); box-shadow: var(--shadow-md);
 }
-.feature-card__media img { width: 100%; height: 100%; object-fit: cover; transition: transform 600ms var(--ease); }
-.feature-card:hover .feature-card__media:not(.gallery) img { transform: scale(1.06); }
+.feature-card__media img { width: 100%; height: 100%; object-fit: cover; }
 .feature-card__title { margin-top: 22px; font-size: 1.45rem; }
 .feature-card__text { margin-top: 8px; max-width: 26ch; font-size: .9rem; color: var(--color-text-muted); }
 .feature-card__price { margin: auto 0 18px; padding-top: 14px; font-family: var(--font-display); font-size: 1.5rem; line-height: 1; color: var(--color-heading); }
@@ -495,8 +494,7 @@ address { font-style: normal; }
 }
 .product-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); }
 .product-card__media { aspect-ratio: 1; overflow: hidden; }
-.product-card__media img { width: 100%; height: 100%; object-fit: cover; transition: transform 600ms var(--ease); }
-.product-card:hover .product-card__media:not(.gallery) img { transform: scale(1.06); }
+.product-card__media img { width: 100%; height: 100%; object-fit: cover; }
 .product-card__body { display: flex; flex-direction: column; flex: 1; gap: 4px; padding: 14px 12px 12px; text-align: center; }
 .product-card__title { font-size: 1.12rem; }
 .product-card__note { font-size: .74rem; line-height: 1.4; color: var(--color-text-muted); }
@@ -572,12 +570,8 @@ address { font-style: normal; }
 
 /* ---------- 12. Rodapé ---------- */
 .site-footer { background: var(--footer-bg); color: var(--footer-text); padding-top: 56px; }
-.site-footer__grid { display: grid; gap: 36px 24px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
-.site-footer__brand { grid-column: 1 / -1; }
+.site-footer__grid { display: grid; gap: 36px; }
 .footer-col { min-width: 0; }
-@media (max-width: 479px) {
-  .footer-col--wide { grid-column: 1 / -1; }
-}
 .brand--footer .brand__name { color: var(--footer-text); font-size: 1.3rem; }
 .brand--footer .brand__name em { color: var(--footer-accent); }
 .brand--footer .brand__logo { width: 60px; height: 60px; }
@@ -594,21 +588,9 @@ address { font-style: normal; }
 .social__link .icon { width: 20px; height: 20px; }
 
 .footer-col__title { font-family: var(--font-body); font-size: .8rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--footer-accent); margin-bottom: 14px; }
-.footer-col ul { display: grid; gap: 4px; }
-.footer-col a {
-  display: inline-flex; align-items: center; gap: 8px; min-height: 36px;
-  color: var(--footer-muted); text-decoration: none; font-size: .9rem; overflow-wrap: break-word; min-width: 0;
-  transition: color var(--dur) var(--ease);
-}
-.footer-col a:hover { color: var(--footer-text); }
-.footer-col .icon { width: 1.05em; height: 1.05em; color: var(--footer-accent); }
+.hours { display: grid; gap: 4px; }
 .hours li { display: flex; flex-direction: column; overflow-wrap: anywhere; font-size: .88rem; color: var(--footer-muted); padding-block: 4px; }
 .hours li span:first-child { font-weight: 600; color: var(--footer-text); }
-.address { font-size: .9rem; color: var(--footer-muted); overflow-wrap: anywhere; }
-.address a { line-height: 1.6; text-decoration: underline; text-decoration-color: color-mix(in srgb, var(--footer-accent) 45%, transparent); text-underline-offset: 4px; }
-.link-arrow { margin-top: 8px; font-weight: 600; color: var(--footer-accent) !important; }
-.link-arrow .icon { transition: transform var(--dur) var(--ease); }
-.link-arrow:hover .icon { transform: translateX(3px); }
 
 .site-footer__bottom {
   display: flex; flex-direction: column; align-items: center; gap: 6px;
@@ -621,16 +603,15 @@ address { font-style: normal; }
 
 @media (min-width: 768px) {
   .site-footer { padding-top: 72px; }
-  .site-footer__brand { grid-column: 1 / -1; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; }
-  .site-footer__tagline { margin-top: 0; }
-  .social { margin-top: 0; }
+  .site-footer__tagline { max-width: 22ch; }
+  .social { margin-top: 20px; }
+  /* Horário lado a lado para ocupar a largura */
+  .hours { grid-auto-flow: column; justify-content: start; gap: 0 48px; }
   .site-footer__bottom { flex-direction: row; justify-content: space-between; padding-bottom: 28px; }
 }
 @media (min-width: 1024px) {
-  .site-footer__grid { grid-template-columns: minmax(0, 1.4fr) minmax(0, .8fr) minmax(0, 1.3fr) minmax(0, 1fr) minmax(0, 1.1fr); gap: 36px 32px; }
-  .site-footer__brand { grid-column: auto; display: block; }
-  .site-footer__tagline { margin-top: 14px; max-width: 22ch; }
-  .social { margin-top: 20px; }
+  .site-footer__grid { grid-template-columns: auto auto; justify-content: space-between; align-items: center; gap: 48px; }
+  .site-footer__hours { padding-left: 48px; border-left: 1px solid color-mix(in srgb, var(--footer-accent) 22%, transparent); }
 }
 
 /* ---------- 13. WhatsApp flutuante ---------- */

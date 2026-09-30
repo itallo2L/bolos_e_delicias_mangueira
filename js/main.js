@@ -131,7 +131,7 @@
       b.type = 'button';
       b.className = 'dots__btn';
       b.setAttribute('aria-label', 'Mostrar item ' + (i + 1) + ' de ' + slides.length);
-      b.addEventListener('click', function () { goTo(i); restart(); });
+      b.addEventListener('click', function () { goTo(i); });
       dotsWrap.appendChild(b);
       return b;
     });
@@ -142,39 +142,50 @@
       dots.forEach(function (d, j) { d.setAttribute('aria-current', String(i === j)); });
     }
     function goTo(i) {
-      track.scrollTo({ left: slides[i].offsetLeft - track.offsetLeft, behavior: 'smooth' });
       mark(i);
+      var left = i * track.clientWidth;
+      if (Math.abs(track.scrollLeft - left) < 1) { schedule(); return; } // já está no slide: não haverá rolagem
+      stop(); // o próximo avanço é agendado quando a rolagem terminar
+      track.scrollTo({ left: left, behavior: 'smooth' });
     }
     mark(0);
 
-    var raf;
+    /* Só atualiza o índice quando a rolagem assenta; posições intermediárias
+       da animação faziam o carrossel voltar ou pular depoimentos */
+    var settle;
     track.addEventListener('scroll', function () {
-      cancelAnimationFrame(raf);
-      raf = requestAnimationFrame(function () {
+      clearTimeout(settle);
+      settle = setTimeout(function () {
         mark(Math.round(track.scrollLeft / track.clientWidth));
-      });
+        schedule();
+      }, 150);
     }, { passive: true });
 
     track.addEventListener('keydown', function (e) {
-      if (e.key === 'ArrowRight') { goTo(Math.min(current + 1, slides.length - 1)); restart(); }
-      if (e.key === 'ArrowLeft') { goTo(Math.max(current - 1, 0)); restart(); }
+      if (e.key === 'ArrowRight') goTo(Math.min(current + 1, slides.length - 1));
+      if (e.key === 'ArrowLeft') goTo(Math.max(current - 1, 0));
     });
 
     /* Avanço automático discreto (pausado ao interagir e com movimento reduzido) */
     var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    var timer;
-    function start() {
-      if (reduce) return;
-      timer = setInterval(function () { goTo((current + 1) % slides.length); }, 9000); // tempo para ler avaliações longas
+    var timer, hovering = false, focused = false, touching = false;
+    function schedule() {
+      stop();
+      if (reduce || hovering || focused || touching) return;
+      timer = setTimeout(function () { goTo((current + 1) % slides.length); }, 5000); // 5 segundos por depoimento
     }
-    function stop() { clearInterval(timer); }
-    function restart() { stop(); start(); }
-    carousel.addEventListener('mouseenter', stop);
-    carousel.addEventListener('mouseleave', start);
-    carousel.addEventListener('focusin', stop);
-    carousel.addEventListener('focusout', start);
-    carousel.addEventListener('touchstart', stop, { passive: true });
-    start();
+    function stop() { clearTimeout(timer); }
+    carousel.addEventListener('pointerenter', function (e) { if (e.pointerType === 'mouse') { hovering = true; stop(); } });
+    carousel.addEventListener('pointerleave', function (e) { if (e.pointerType === 'mouse') { hovering = false; schedule(); } });
+    carousel.addEventListener('focusin', function (e) {
+      // pausa só com foco via teclado; clicar num ponto não deve travar o carrossel
+      try { focused = e.target.matches(':focus-visible'); } catch (err) { focused = false; }
+      if (focused) stop();
+    });
+    carousel.addEventListener('focusout', function () { focused = false; schedule(); });
+    track.addEventListener('touchstart', function () { touching = true; stop(); }, { passive: true });
+    track.addEventListener('touchend', function () { touching = false; schedule(); }, { passive: true });
+    schedule();
   });
 
   /* ---------- Galeria de fotos nos cards ---------- */
